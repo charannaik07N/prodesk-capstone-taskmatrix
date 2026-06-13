@@ -6,12 +6,12 @@ import {
 } from "@/lib/supabase";
 
 const useAuthStore = create((set, get) => ({
-  // State
+
   user: null,
   isAuthenticated: false,
   loading: true,
 
-  // Actions
+  
   setUser: (user) =>
     set({
       user: user
@@ -73,7 +73,6 @@ const useAuthStore = create((set, get) => ({
 
       if (error) throw error;
 
-      // Some Supabase projects require email confirmation
       if (data.user && !data.session) {
         return {
           success: true,
@@ -106,7 +105,6 @@ const useAuthStore = create((set, get) => ({
       set({ user: null, isAuthenticated: false });
     } catch (error) {
       console.error("Logout error:", error);
-      // Still clear local state even if server logout fails
       set({ user: null, isAuthenticated: false });
     } finally {
       set({ loading: false });

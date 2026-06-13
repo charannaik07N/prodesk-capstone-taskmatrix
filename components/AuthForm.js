@@ -67,7 +67,7 @@ export default function AuthForm({ mode = 'login' }) {
   return (
     <div className="h-screen overflow-hidden w-full flex bg-[#F8FAFC] font-sans">
       
-      {/* Left Column: Brand Storytelling */}
+     
       <div className="hidden lg:flex lg:w-[40%] flex-col justify-between bg-[#F8FAFC] border-r border-[#E2E8F0] p-8 lg:p-10 xl:p-16">
         
         <div className="max-w-md w-full mx-auto flex flex-col h-full justify-center">
@@ -94,7 +94,7 @@ export default function AuthForm({ mode = 'login' }) {
               The unified workspace where ambitious teams plan, manage, and collaborate to deliver their best work.
             </p>
 
-            {/* Feature List */}
+            
             <div className="flex flex-col gap-y-6">
               {[
                 'Plan projects',
@@ -111,7 +111,7 @@ export default function AuthForm({ mode = 'login' }) {
             </div>
           </div>
 
-          {/* Trust Metrics */}
+       
           <div className="flex items-center gap-3 border-t border-[#E2E8F0] pt-8 shrink-0">
             <div className="flex -space-x-2 shrink-0">
               <div className="w-7 h-7 rounded-full border-2 border-[#F8FAFC] bg-blue-100 flex items-center justify-center text-[9px] font-bold text-blue-700">JD</div>
@@ -123,11 +123,11 @@ export default function AuthForm({ mode = 'login' }) {
         </div>
       </div>
 
-      {/* Right Column: Authentication Form */}
+     
       <div className="flex-1 flex flex-col items-center justify-center p-6 sm:p-12 bg-[#FFFFFF]">
         <div className="w-full max-w-[480px]">
           
-          {/* Mobile Logo Header */}
+          
           <div className="flex lg:hidden items-center gap-2.5 mb-12">
             <div className="w-8 h-8 bg-[#2563EB] rounded-[6px] flex items-center justify-center shrink-0">
               <svg viewBox="0 0 24 24" className="w-5 h-5 text-white" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -268,7 +268,7 @@ export default function AuthForm({ mode = 'login' }) {
             </form>
           </div>
 
-          {/* Footer outside container */}
+    
           <div className="mt-8 text-center text-[15px] text-[#64748B]">
             {isLogin ? "Don't have an account? " : "Already have an account? "}
             <Link 

@@ -112,7 +112,7 @@ export default function Sidebar() {
         `}
         style={{ width: '240px' }}
       >
-        {/* Logo Header & Workspace Selector */}
+       
         <div className="flex flex-col border-b border-[#E5E7EB] px-4 py-4 shrink-0 bg-[#F8F9FB]">
           <div className="flex items-center gap-2 mb-3">
             <div className="w-5 h-5 bg-[#2563EB] rounded-[4px] flex items-center justify-center shrink-0">
@@ -134,7 +134,7 @@ export default function Sidebar() {
           </button>
         </div>
 
-        {/* Navigation */}
+       
         <nav className="flex-1 overflow-y-auto px-3 py-4 flex flex-col gap-6 bg-[#F8F9FB]">
           {NAV_SECTIONS.map((section, idx) => (
             <div key={idx} className="flex flex-col gap-1">
