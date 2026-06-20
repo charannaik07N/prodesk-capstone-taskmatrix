@@ -1,4 +1,5 @@
 import { Plus_Jakarta_Sans } from 'next/font/google';
+import { Toaster } from 'sonner';
 import './globals.css';
 
 const jakarta = Plus_Jakarta_Sans({
@@ -24,6 +25,7 @@ export default function RootLayout({ children }) {
     <html lang="en" className={`${jakarta.variable} light`} suppressHydrationWarning>
       <body className="antialiased min-h-screen bg-background font-sans text-foreground" suppressHydrationWarning>
         {children}
+        <Toaster position="bottom-right" richColors />
       </body>
     </html>
   );

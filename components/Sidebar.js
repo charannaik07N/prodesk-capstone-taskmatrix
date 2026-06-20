@@ -1,10 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import useAuthStore from '@/store/authStore';
+import useProjectStore from '@/store/projectStore';
+import useTaskStore from '@/store/taskStore';
+import useActivityStore from '@/store/activityStore';
+import useNotificationStore from '@/store/notificationStore';
 import { 
   LayoutDashboard, 
   FolderKanban, 
@@ -20,13 +24,15 @@ import {
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 
+// ... (keep NAV_SECTIONS and NavItem the same)
+
 const NAV_SECTIONS = [
   {
     title: 'WORKSPACE',
     items: [
       { id: 'dashboard', label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
       { id: 'projects', label: 'Projects', href: '/dashboard/projects', icon: FolderKanban },
-      { id: 'tasks', label: 'Tasks', href: '/dashboard/tasks', icon: CheckSquare },
+      { id: 'board', label: 'Board', href: '/dashboard/board', icon: CheckSquare },
       { id: 'calendar', label: 'Calendar', href: '/dashboard/calendar', icon: CalendarDays },
     ]
   },
@@ -68,6 +74,28 @@ export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const { user, logout } = useAuthStore();
+  
+  const { fetchProjects, subscribeToProjects, unsubscribeFromProjects } = useProjectStore();
+  const { fetchTasks, subscribeToTasks, unsubscribeFromTasks } = useTaskStore();
+  const { fetchActivity } = useActivityStore();
+  const { fetchNotifications, subscribeToNotifications, unsubscribeFromNotifications } = useNotificationStore();
+
+  useEffect(() => {
+    fetchProjects();
+    fetchTasks();
+    fetchActivity();
+    fetchNotifications();
+    
+    subscribeToProjects();
+    subscribeToTasks();
+    subscribeToNotifications();
+
+    return () => {
+      unsubscribeFromProjects();
+      unsubscribeFromTasks();
+      unsubscribeFromNotifications();
+    };
+  }, [fetchProjects, fetchTasks, subscribeToProjects, subscribeToTasks, unsubscribeFromProjects, unsubscribeFromTasks, fetchActivity, fetchNotifications, subscribeToNotifications, unsubscribeFromNotifications]);
 
   const handleLogout = async () => {
     await logout();
