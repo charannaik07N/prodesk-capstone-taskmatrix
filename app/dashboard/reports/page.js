@@ -74,7 +74,7 @@ export default function ReportsPage() {
     <div className="p-8 max-w-[1200px] w-full font-sans mx-auto">
       <div className="mb-8">
         <h1 className="text-[24px] font-bold tracking-tight text-[#111827] mb-1">Productivity Analytics</h1>
-        <p className="text-[14px] text-[#6B7280]">Gain insights into your team's performance and task velocity.</p>
+        <p className="text-[14px] text-[#6B7280]">Gain insights into your team&apos;s performance and task velocity.</p>
       </div>
 
       {/* Top Metric Cards */}

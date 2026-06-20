@@ -63,16 +63,9 @@ export default function ProjectDetailsPage({ params }) {
   const totalTasks = projectTasks.length;
   const progressPercentage = totalTasks === 0 ? 0 : Math.round((completedTasks / totalTasks) * 100);
 
-  if (!project) {
-    return (
-      <div className="p-8 flex flex-col items-center justify-center h-full">
-        <p className="text-[#6B7280]">Project not found or loading...</p>
-        <Button variant="outline" className="mt-4" onClick={() => router.push('/dashboard/projects')}>
-          Go Back
-        </Button>
-      </div>
-    );
-  }
+  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+  const [isSubmittingTask, setIsSubmittingTask] = useState(false);
+  const [taskTitle, setTaskTitle] = useState('');
 
   const handleDelete = async () => {
     if (confirm('Are you sure you want to delete this project and all its tasks?')) {
@@ -80,10 +73,6 @@ export default function ProjectDetailsPage({ params }) {
       router.push('/dashboard');
     }
   };
-
-  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
-  const [isSubmittingTask, setIsSubmittingTask] = useState(false);
-  const [taskTitle, setTaskTitle] = useState('');
 
   const handleCreateTask = async (e) => {
     e.preventDefault();
@@ -105,6 +94,17 @@ export default function ProjectDetailsPage({ params }) {
       openTaskDrawer(data.id);
     }
   };
+
+  if (!project) {
+    return (
+      <div className="p-8 flex flex-col items-center justify-center h-full">
+        <p className="text-[#6B7280]">Project not found or loading...</p>
+        <Button variant="outline" className="mt-4" onClick={() => router.push('/dashboard/projects')}>
+          Go Back
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="p-8 max-w-[1200px] w-full font-sans mx-auto">
