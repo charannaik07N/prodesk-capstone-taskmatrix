@@ -194,7 +194,7 @@ export default function ProjectDetailsPage({ params }) {
       </div>
 
       {/* Task List */}
-      <div className="border border-[#E5E7EB] rounded-[12px] bg-[#FFFFFF] shadow-[0_1px_2px_rgba(0,0,0,0.02)] overflow-hidden">
+      <div className="border border-[#E5E7EB] rounded-[12px] bg-[#FFFFFF] shadow-[0_1px_2px_rgba(0,0,0,0.02)] overflow-hidden w-full max-w-full">
         <div className="px-6 py-4 border-b border-[#E5E7EB] bg-[#F8F9FB] flex justify-between items-center">
           <h2 className="text-[15px] font-bold text-[#111827]">Project Tasks</h2>
         </div>
@@ -202,34 +202,72 @@ export default function ProjectDetailsPage({ params }) {
         {projectTasks.length === 0 ? (
           <NoTasks onAction={() => setIsTaskModalOpen(true)} />
         ) : (
-          <Table>
-            <TableHeader className="bg-transparent hover:bg-transparent">
-              <TableRow className="border-b border-[#E5E7EB]">
-                <TableHead className="w-[400px] text-[11px] font-semibold text-[#6B7280] uppercase tracking-wider h-10">Task</TableHead>
-                <TableHead className="text-[11px] font-semibold text-[#6B7280] uppercase tracking-wider h-10">Status</TableHead>
-                <TableHead className="text-[11px] font-semibold text-[#6B7280] uppercase tracking-wider h-10">Priority</TableHead>
-                <TableHead className="text-[11px] font-semibold text-[#6B7280] uppercase tracking-wider h-10">Assignee</TableHead>
-                <TableHead className="text-right text-[11px] font-semibold text-[#6B7280] uppercase tracking-wider h-10">Due Date</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
+          <>
+            {/* Mobile Stacked Card Layout (< md) */}
+            <div className="md:hidden divide-y divide-[#E5E7EB]">
               {projectTasks.map((task) => (
-                <TableRow 
+                <div 
                   key={task.id} 
-                  className="cursor-pointer hover:bg-[#F8F9FB] border-b border-[#F3F4F6] transition-colors duration-150"
                   onClick={() => openTaskDrawer(task.id)}
+                  className="p-4 cursor-pointer hover:bg-[#F8F9FB] transition-colors flex flex-col gap-2.5 w-full overflow-hidden"
                 >
-                  <TableCell className="font-medium text-[13px] text-[#111827] py-3">{task.title || 'Untitled Task'}</TableCell>
-                  <TableCell className="py-3 text-[13px] text-[#6B7280]">{task.status}</TableCell>
-                  <TableCell className="py-3"><PriorityBadge priority={task.priority} /></TableCell>
-                  <TableCell className="py-3 text-[13px] text-[#6B7280]">{task.assignee?.raw_user_meta_data?.name || 'Unassigned'}</TableCell>
-                  <TableCell className="text-right text-[12px] text-[#6B7280] py-3">
-                    {task.due_date ? format(new Date(task.due_date), 'MMM d, yyyy') : '-'}
-                  </TableCell>
-                </TableRow>
+                  <div className="flex items-start justify-between gap-3 w-full">
+                    <span className="font-medium text-[13px] text-[#111827] break-words overflow-wrap flex-1 leading-snug">
+                      {task.title || 'Untitled Task'}
+                    </span>
+                    <span className="text-[12px] font-medium text-[#6B7280] bg-[#F3F4F6] px-2 py-0.5 rounded shrink-0">
+                      {task.status}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between text-[12px] text-[#6B7280] pt-1">
+                    <div className="flex items-center gap-2 truncate">
+                      <PriorityBadge priority={task.priority} />
+                      <span className="truncate text-[#9CA3AF]">
+                        {task.assignee?.raw_user_meta_data?.name || 'Unassigned'}
+                      </span>
+                    </div>
+                    <span className="shrink-0">
+                      {task.due_date ? format(new Date(task.due_date), 'MMM d, yyyy') : '-'}
+                    </span>
+                  </div>
+                </div>
               ))}
-            </TableBody>
-          </Table>
+            </div>
+
+            {/* Desktop Table Layout (>= md) */}
+            <div className="hidden md:block overflow-x-auto w-full">
+              <Table className="w-full">
+                <TableHeader className="bg-transparent hover:bg-transparent">
+                  <TableRow className="border-b border-[#E5E7EB]">
+                    <TableHead className="text-[11px] font-semibold text-[#6B7280] uppercase tracking-wider h-10">Task</TableHead>
+                    <TableHead className="text-[11px] font-semibold text-[#6B7280] uppercase tracking-wider h-10">Status</TableHead>
+                    <TableHead className="text-[11px] font-semibold text-[#6B7280] uppercase tracking-wider h-10">Priority</TableHead>
+                    <TableHead className="text-[11px] font-semibold text-[#6B7280] uppercase tracking-wider h-10">Assignee</TableHead>
+                    <TableHead className="text-right text-[11px] font-semibold text-[#6B7280] uppercase tracking-wider h-10">Due Date</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {projectTasks.map((task) => (
+                    <TableRow 
+                      key={task.id} 
+                      className="cursor-pointer hover:bg-[#F8F9FB] border-b border-[#F3F4F6] transition-colors duration-150"
+                      onClick={() => openTaskDrawer(task.id)}
+                    >
+                      <TableCell className="font-medium text-[13px] text-[#111827] py-3 w-full max-w-[250px] lg:max-w-none break-words overflow-wrap">
+                        <div className="break-words overflow-wrap">{task.title || 'Untitled Task'}</div>
+                      </TableCell>
+                      <TableCell className="py-3 text-[13px] text-[#6B7280] whitespace-nowrap">{task.status}</TableCell>
+                      <TableCell className="py-3 whitespace-nowrap"><PriorityBadge priority={task.priority} /></TableCell>
+                      <TableCell className="py-3 text-[13px] text-[#6B7280] whitespace-nowrap">{task.assignee?.raw_user_meta_data?.name || 'Unassigned'}</TableCell>
+                      <TableCell className="text-right text-[12px] text-[#6B7280] py-3 whitespace-nowrap">
+                        {task.due_date ? format(new Date(task.due_date), 'MMM d, yyyy') : '-'}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </>
         )}
       </div>
 

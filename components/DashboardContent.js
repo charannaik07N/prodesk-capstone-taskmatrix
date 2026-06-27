@@ -267,61 +267,96 @@ export default function DashboardContent() {
             </div>
           </div>
           
-          <div className="border border-[#E5E7EB] rounded-[12px] bg-[#FFFFFF] shadow-[0_1px_2px_rgba(0,0,0,0.02)] overflow-hidden">
-            <Table>
-              <TableHeader className="bg-[#F8F9FB] sticky top-0 border-b border-[#E5E7EB]">
-                <TableRow className="hover:bg-transparent border-none">
-                  <TableHead className="w-[80px] text-[11px] font-semibold text-[#6B7280] uppercase tracking-wider h-9">ID</TableHead>
-                  <TableHead className="text-[11px] font-semibold text-[#6B7280] uppercase tracking-wider h-9">
-                    <div className="flex items-center cursor-pointer hover:text-[#111827]" onClick={() => handleSort('title')}>
-                      Task <ArrowUpDown className="w-3 h-3 ml-1" />
+          <div className="border border-[#E5E7EB] rounded-[12px] bg-[#FFFFFF] shadow-[0_1px_2px_rgba(0,0,0,0.02)] overflow-hidden w-full max-w-full">
+            {/* Mobile Stacked Card Layout (< md) */}
+            <div className="md:hidden divide-y divide-[#E5E7EB]">
+              {filteredAndSortedTasks.length === 0 ? (
+                <div className="h-24 flex items-center justify-center text-[#6B7280] text-[13px] p-4 text-center">
+                  No tasks found matching your filters.
+                </div>
+              ) : (
+                filteredAndSortedTasks.map((task) => (
+                  <div 
+                    key={task.id} 
+                    onClick={() => openTaskDrawer(task.id)}
+                    className="p-4 cursor-pointer hover:bg-[#F3F4F6] transition-colors flex flex-col gap-2.5 w-full overflow-hidden"
+                  >
+                    <div className="flex items-start justify-between gap-3 w-full">
+                      <span className="font-medium text-[13px] text-[#111827] break-words overflow-wrap flex-1 leading-snug">
+                        {task.title}
+                      </span>
+                      <div className="shrink-0">
+                        <StatusBadge status={task.status} />
+                      </div>
                     </div>
-                  </TableHead>
-                  <TableHead className="text-[11px] font-semibold text-[#6B7280] uppercase tracking-wider h-9">
-                    <div className="flex items-center cursor-pointer hover:text-[#111827]" onClick={() => handleSort('status')}>
-                      Status <ArrowUpDown className="w-3 h-3 ml-1" />
-                    </div>
-                  </TableHead>
-                  <TableHead className="text-[11px] font-semibold text-[#6B7280] uppercase tracking-wider h-9">
-                    <div className="flex items-center cursor-pointer hover:text-[#111827]" onClick={() => handleSort('priority')}>
-                      Priority <ArrowUpDown className="w-3 h-3 ml-1" />
-                    </div>
-                  </TableHead>
-                  <TableHead className="text-right text-[11px] font-semibold text-[#6B7280] uppercase tracking-wider h-9">
-                    <div className="flex items-center justify-end cursor-pointer hover:text-[#111827]" onClick={() => handleSort('due_date')}>
-                      Due <ArrowUpDown className="w-3 h-3 ml-1" />
-                    </div>
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredAndSortedTasks.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={5} className="h-24 text-center text-[#6B7280] text-[13px]">
-                      No tasks found matching your filters.
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  filteredAndSortedTasks.map((task) => (
-                    <TableRow 
-                      key={task.id} 
-                      className="cursor-pointer even:bg-[#F8F9FB]/40 hover:bg-[#F3F4F6] border-b border-[#F3F4F6] transition-colors"
-                      onClick={() => openTaskDrawer(task.id)}
-                    >
-                      <TableCell className="font-mono text-[12px] text-[#6B7280] py-2">
-                        {task.id.split('-')[0] + '-' + task.id.split('-')[task.id.split('-').length-1].slice(0,4)}
-                      </TableCell>
-                      <TableCell className="font-medium text-[13px] text-[#111827] py-2">{task.title}</TableCell>
-                      <TableCell className="py-2"><StatusBadge status={task.status} /></TableCell>
-                      <TableCell className="py-2"><PriorityBadge priority={task.priority} /></TableCell>
-                      <TableCell className="text-right text-[12px] text-[#6B7280] py-2">
+                    <div className="flex items-center justify-between text-[12px] text-[#6B7280] pt-1">
+                      <div className="flex items-center gap-2">
+                        <PriorityBadge priority={task.priority} />
+                      </div>
+                      <span className="truncate">
                         {task.due_date ? format(new Date(task.due_date), 'MMM d, yyyy') : '-'}
+                      </span>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* Desktop Table Layout (>= md) */}
+            <div className="hidden md:block overflow-x-auto w-full">
+              <Table className="w-full">
+                <TableHeader className="bg-[#F8F9FB] sticky top-0 border-b border-[#E5E7EB]">
+                  <TableRow className="hover:bg-transparent border-none">
+                    <TableHead className="text-[11px] font-semibold text-[#6B7280] uppercase tracking-wider h-9">
+                      <div className="flex items-center cursor-pointer hover:text-[#111827]" onClick={() => handleSort('title')}>
+                        Task <ArrowUpDown className="w-3 h-3 ml-1 shrink-0" />
+                      </div>
+                    </TableHead>
+                    <TableHead className="text-[11px] font-semibold text-[#6B7280] uppercase tracking-wider h-9">
+                      <div className="flex items-center cursor-pointer hover:text-[#111827]" onClick={() => handleSort('status')}>
+                        Status <ArrowUpDown className="w-3 h-3 ml-1 shrink-0" />
+                      </div>
+                    </TableHead>
+                    <TableHead className="text-[11px] font-semibold text-[#6B7280] uppercase tracking-wider h-9">
+                      <div className="flex items-center cursor-pointer hover:text-[#111827]" onClick={() => handleSort('priority')}>
+                        Priority <ArrowUpDown className="w-3 h-3 ml-1 shrink-0" />
+                      </div>
+                    </TableHead>
+                    <TableHead className="text-right text-[11px] font-semibold text-[#6B7280] uppercase tracking-wider h-9">
+                      <div className="flex items-center justify-end cursor-pointer hover:text-[#111827]" onClick={() => handleSort('due_date')}>
+                        Due <ArrowUpDown className="w-3 h-3 ml-1 shrink-0" />
+                      </div>
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredAndSortedTasks.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={4} className="h-24 text-center text-[#6B7280] text-[13px]">
+                        No tasks found matching your filters.
                       </TableCell>
                     </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
+                  ) : (
+                    filteredAndSortedTasks.map((task) => (
+                      <TableRow 
+                        key={task.id} 
+                        className="cursor-pointer even:bg-[#F8F9FB]/40 hover:bg-[#F3F4F6] border-b border-[#F3F4F6] transition-colors"
+                        onClick={() => openTaskDrawer(task.id)}
+                      >
+                        <TableCell className="font-medium text-[13px] text-[#111827] py-2 w-full max-w-[250px] lg:max-w-none break-words overflow-wrap">
+                          <div className="break-words overflow-wrap">{task.title}</div>
+                        </TableCell>
+                        <TableCell className="py-2 whitespace-nowrap"><StatusBadge status={task.status} /></TableCell>
+                        <TableCell className="py-2 whitespace-nowrap"><PriorityBadge priority={task.priority} /></TableCell>
+                        <TableCell className="text-right text-[12px] text-[#6B7280] py-2 whitespace-nowrap">
+                          {task.due_date ? format(new Date(task.due_date), 'MMM d, yyyy') : '-'}
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </div>
           </div>
         </div>
 
