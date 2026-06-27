@@ -53,10 +53,12 @@ const NAV_SECTIONS = [
 
 function NavItem({ item, isActive }) {
   const Icon = item.icon;
+  const isUnbuiltRoute = ['/dashboard/calendar', '/dashboard/team', '/dashboard/settings'].includes(item.href);
   
   return (
     <Link
       href={item.href}
+      prefetch={isUnbuiltRoute ? false : undefined}
       className={`flex items-center gap-2.5 px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors border-l-2 ${
         isActive 
           ? 'bg-[#2563EB]/5 border-[#2563EB] text-[#2563EB]' 
