@@ -5,8 +5,9 @@ import { useRouter } from 'next/navigation';
 import useProjectStore from '@/store/projectStore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { FolderKanban, Plus, CheckCircle2, CircleDashed } from 'lucide-react';
+import { FolderKanban, Plus, CheckCircle2, CircleDashed, Loader2 } from 'lucide-react';
 import useTaskStore from '@/store/taskStore';
+import { NoProjects } from '@/components/ui/empty-states';
 import { format } from 'date-fns';
 import {
   Dialog,
@@ -56,16 +57,7 @@ export default function ProjectsPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {projects.length === 0 ? (
-           <div className="col-span-full p-12 flex flex-col items-center justify-center text-center border border-[#E5E7EB] rounded-[12px] bg-white border-dashed">
-             <div className="w-12 h-12 rounded-full bg-[#F3F4F6] flex items-center justify-center mb-4">
-               <FolderKanban className="w-6 h-6 text-[#9CA3AF]" />
-             </div>
-             <h3 className="text-[15px] font-semibold text-[#111827] mb-1">No projects yet</h3>
-             <p className="text-[14px] text-[#6B7280] mb-4">Create your first project to start organizing tasks.</p>
-             <Button onClick={() => setIsModalOpen(true)} variant="outline" className="h-9">
-               <Plus className="w-4 h-4 mr-2" /> New Project
-             </Button>
-           </div>
+           <NoProjects onAction={() => setIsModalOpen(true)} />
         ) : (
           projects.map((project) => {
             const projectTasks = tasks.filter(t => t.project_id === project.id);
@@ -75,7 +67,7 @@ export default function ProjectsPage() {
             return (
               <div 
                 key={project.id} 
-                className="p-6 rounded-[12px] border border-[#E5E7EB] bg-[#FFFFFF] shadow-[0_1px_2px_rgba(0,0,0,0.02)] cursor-pointer hover:border-[#2563EB]/50 transition-colors group"
+                className="p-6 rounded-[12px] border border-[#E5E7EB] bg-[#FFFFFF] shadow-[0_1px_2px_rgba(0,0,0,0.02)] cursor-pointer hover:border-[#2563EB]/50 transition-all duration-200 ease-in-out hover:shadow-md hover:scale-[1.01] group"
                 onClick={() => router.push(`/dashboard/projects/${project.id}`)}
               >
                 <div className="flex justify-between items-start mb-4">
@@ -144,7 +136,8 @@ export default function ProjectsPage() {
               <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>
                 Cancel
               </Button>
-              <Button type="submit" disabled={!formData.name.trim() || isSubmitting} className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white">
+              <Button type="submit" disabled={!formData.name.trim() || isSubmitting} className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white inline-flex items-center">
+                {isSubmitting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                 {isSubmitting ? 'Creating...' : 'Create Project'}
               </Button>
             </DialogFooter>

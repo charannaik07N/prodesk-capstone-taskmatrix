@@ -33,19 +33,35 @@ import {
   AlertCircle,
   X,
   AlignLeft,
-  Tag
+  Tag,
+  Trash2
 } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { toast } from 'sonner';
+import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 
 export default function TaskDetailsDrawer() {
   const { isTaskDrawerOpen, selectedTaskId, closeTaskDrawer } = useUIStore();
-  const { tasks, updateTask } = useTaskStore();
+  const { tasks, updateTask, deleteTask } = useTaskStore();
   const { projects } = useProjectStore();
 
   const [task, setTask] = useState(null);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isDeletingTask, setIsDeletingTask] = useState(false);
+
+  const executeDeleteTask = async () => {
+    if (!task) return;
+    setIsDeletingTask(true);
+    const { success } = await deleteTask(task.id);
+    setIsDeletingTask(false);
+    if (success) {
+      setIsDeleteDialogOpen(false);
+      closeTaskDrawer();
+    }
+  };
 
   // Sync local state when the drawer opens or selected task changes
   useEffect(() => {
@@ -102,9 +118,14 @@ export default function TaskDetailsDrawer() {
             </span>
             <span>in {project?.name || 'Unknown Project'}</span>
           </div>
-          <Button variant="ghost" size="icon" onClick={closeTaskDrawer} className="h-8 w-8 text-[#6B7280] hover:text-[#111827]">
-            <X className="w-4 h-4" />
-          </Button>
+          <div className="flex items-center gap-1">
+            <Button variant="ghost" size="icon" onClick={() => setIsDeleteDialogOpen(true)} className="h-8 w-8 text-[#6B7280] hover:text-[#DC2626] hover:bg-[#DC2626]/10" title="Delete Task">
+              <Trash2 className="w-4 h-4" />
+            </Button>
+            <Button variant="ghost" size="icon" onClick={closeTaskDrawer} className="h-8 w-8 text-[#6B7280] hover:text-[#111827]">
+              <X className="w-4 h-4" />
+            </Button>
+          </div>
         </div>
 
         <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-8">
@@ -212,6 +233,16 @@ export default function TaskDetailsDrawer() {
           </div>
 
         </div>
+        
+        <ConfirmDialog
+          open={isDeleteDialogOpen}
+          onOpenChange={setIsDeleteDialogOpen}
+          title="Delete Task?"
+          description="Are you sure you want to delete this task? This action cannot be undone."
+          confirmText="Delete Task"
+          isLoading={isDeletingTask}
+          onConfirm={executeDeleteTask}
+        />
       </SheetContent>
     </Sheet>
   );

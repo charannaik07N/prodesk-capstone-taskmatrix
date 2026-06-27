@@ -28,12 +28,18 @@ const useTaskStore = create((set, get) => ({
   },
 
   createTask: async (taskData) => {
-    if (!supabase) return { success: false, error: 'Supabase not configured' };
+    if (!supabase) {
+      toast.error('Supabase not configured');
+      return { success: false, error: 'Supabase not configured' };
+    }
     
-    // Get current user for created_by
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return { success: false, error: 'Not authenticated' };
+    if (!user) {
+      toast.error('Not authenticated');
+      return { success: false, error: 'Not authenticated' };
+    }
 
+    const toastId = toast.loading('Creating task...');
     try {
       const { data, error } = await supabase
         .from('tasks')
@@ -43,12 +49,11 @@ const useTaskStore = create((set, get) => ({
 
       if (error) throw error;
       
-      // Optimistic update
       set((state) => ({ tasks: [data, ...state.tasks] }));
-      toast.success('Task created successfully');
+      toast.success('Task created successfully', { id: toastId });
       return { success: true, data };
     } catch (error) {
-      toast.error('Failed to create task');
+      toast.error('Failed to create task: ' + error.message, { id: toastId });
       console.error('Error creating task:', error);
       return { success: false, error: error.message };
     }
@@ -56,13 +61,27 @@ const useTaskStore = create((set, get) => ({
 
   updateTask: async (id, updates) => {
     if (!supabase) return { success: false };
+    const previousTasks = get().tasks;
+    
+    // Determine specific action message
+    let actionMsg = 'Updating task...';
+    let successMsg = 'Task updated successfully';
+    if (updates.status) {
+      actionMsg = `Changing status to ${updates.status}...`;
+      successMsg = `Task moved to ${updates.status}`;
+    } else if (updates.priority) {
+      actionMsg = `Changing priority to ${updates.priority}...`;
+      successMsg = `Task priority set to ${updates.priority}`;
+    } else if (updates.assigned_to) {
+      actionMsg = 'Assigning task...';
+      successMsg = 'Task assigned successfully';
+    }
+
+    const toastId = toast.loading(actionMsg);
     try {
-      // Optimistic update for UI snapiness (crucial for Kanban Drag-and-Drop)
       set((state) => {
         const oldTask = state.tasks.find(t => t.id === id);
         if (!oldTask) return state;
-        
-        // We do a shallow merge
         const updatedTask = { ...oldTask, ...updates };
         return {
           tasks: state.tasks.map((t) => (t.id === id ? updatedTask : t)),
@@ -78,16 +97,15 @@ const useTaskStore = create((set, get) => ({
 
       if (error) throw error;
 
-      // Ensure full server data is correct (reconcile)
       set((state) => ({
         tasks: state.tasks.map((t) => (t.id === id ? data : t)),
       }));
       
+      toast.success(successMsg, { id: toastId });
       return { success: true, data };
     } catch (error) {
-      // Revert optimistic update on error
       set({ tasks: previousTasks });
-      toast.error('Failed to update task');
+      toast.error('Failed to update task: ' + error.message, { id: toastId });
       console.error('Error updating task:', error);
       return { success: false, error: error.message };
     }
@@ -95,21 +113,20 @@ const useTaskStore = create((set, get) => ({
 
   deleteTask: async (id) => {
     if (!supabase) return { success: false };
-    
-    // Optimistic update
     const previousTasks = get().tasks;
+    const toastId = toast.loading('Deleting task...');
+    
     set((state) => ({ tasks: state.tasks.filter((t) => t.id !== id) }));
 
     try {
       const { error } = await supabase.from('tasks').delete().eq('id', id);
 
       if (error) throw error;
-      toast.success('Task deleted');
+      toast.success('Task deleted successfully', { id: toastId });
       return { success: true };
     } catch (error) {
-      // Revert
       set({ tasks: previousTasks });
-      toast.error('Failed to delete task');
+      toast.error('Failed to delete task: ' + error.message, { id: toastId });
       console.error('Error deleting task:', error);
       return { success: false, error: error.message };
     }

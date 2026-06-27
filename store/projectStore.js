@@ -28,12 +28,18 @@ const useProjectStore = create((set, get) => ({
   },
 
   createProject: async (projectData) => {
-    if (!supabase) return { success: false, error: 'Supabase not configured' };
+    if (!supabase) {
+      toast.error('Supabase not configured');
+      return { success: false, error: 'Supabase not configured' };
+    }
     
-    // Get current user for owner_id
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return { success: false, error: 'Not authenticated' };
+    if (!user) {
+      toast.error('Not authenticated');
+      return { success: false, error: 'Not authenticated' };
+    }
 
+    const toastId = toast.loading('Creating project...');
     try {
       const { data, error } = await supabase
         .from('projects')
@@ -43,12 +49,11 @@ const useProjectStore = create((set, get) => ({
 
       if (error) throw error;
       
-      // Optimistic update
       set((state) => ({ projects: [data, ...state.projects] }));
-      toast.success('Project created successfully');
+      toast.success('Project created successfully', { id: toastId });
       return { success: true, data };
     } catch (error) {
-      toast.error('Failed to create project');
+      toast.error('Failed to create project: ' + error.message, { id: toastId });
       console.error('Error creating project:', error);
       return { success: false, error: error.message };
     }
@@ -56,6 +61,7 @@ const useProjectStore = create((set, get) => ({
 
   updateProject: async (id, updates) => {
     if (!supabase) return { success: false };
+    const toastId = toast.loading('Updating project...');
     try {
       const { data, error } = await supabase
         .from('projects')
@@ -66,13 +72,13 @@ const useProjectStore = create((set, get) => ({
 
       if (error) throw error;
 
-      // Optimistic update
       set((state) => ({
         projects: state.projects.map((p) => (p.id === id ? data : p)),
       }));
+      toast.success('Project updated successfully', { id: toastId });
       return { success: true, data };
     } catch (error) {
-      toast.error('Failed to update project');
+      toast.error('Failed to update project: ' + error.message, { id: toastId });
       console.error('Error updating project:', error);
       return { success: false, error: error.message };
     }
@@ -80,18 +86,18 @@ const useProjectStore = create((set, get) => ({
 
   deleteProject: async (id) => {
     if (!supabase) return { success: false };
+    const toastId = toast.loading('Deleting project...');
     try {
       const { error } = await supabase.from('projects').delete().eq('id', id);
       if (error) throw error;
 
-      // Optimistic update
       set((state) => ({
         projects: state.projects.filter((p) => p.id !== id),
       }));
-      toast.success('Project deleted');
+      toast.success('Project deleted successfully', { id: toastId });
       return { success: true };
     } catch (error) {
-      toast.error('Failed to delete project');
+      toast.error('Failed to delete project: ' + error.message, { id: toastId });
       console.error('Error deleting project:', error);
       return { success: false, error: error.message };
     }

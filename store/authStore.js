@@ -4,6 +4,7 @@ import {
   supabase,
   supabaseConfigError,
 } from "@/lib/supabase";
+import { toast } from "sonner";
 
 const useAuthStore = create((set, get) => ({
 
@@ -32,9 +33,11 @@ const useAuthStore = create((set, get) => ({
 
   login: async (email, password) => {
     if (!isSupabaseConfigured || !supabase) {
+      toast.error(supabaseConfigError);
       return { success: false, error: supabaseConfigError };
     }
 
+    const toastId = toast.loading("Signing in...");
     set({ loading: true });
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -45,8 +48,10 @@ const useAuthStore = create((set, get) => ({
       if (error) throw error;
 
       get().setUser(data.user);
+      toast.success("Signed in successfully", { id: toastId });
       return { success: true };
     } catch (error) {
+      toast.error(error.message || "Failed to sign in", { id: toastId });
       return { success: false, error: error.message };
     } finally {
       set({ loading: false });
@@ -55,9 +60,11 @@ const useAuthStore = create((set, get) => ({
 
   register: async (fullName, email, password) => {
     if (!isSupabaseConfigured || !supabase) {
+      toast.error(supabaseConfigError);
       return { success: false, error: supabaseConfigError };
     }
 
+    const toastId = toast.loading("Creating account...");
     set({ loading: true });
     try {
       const { data, error } = await supabase.auth.signUp({
@@ -74,6 +81,7 @@ const useAuthStore = create((set, get) => ({
       if (error) throw error;
 
       if (data.user && !data.session) {
+        toast.info("Please check your email to confirm your account.", { id: toastId });
         return {
           success: true,
           requiresConfirmation: true,
@@ -85,8 +93,10 @@ const useAuthStore = create((set, get) => ({
         get().setUser(data.user);
       }
 
+      toast.success("Account created successfully", { id: toastId });
       return { success: true, requiresConfirmation: false };
     } catch (error) {
+      toast.error(error.message || "Failed to create account", { id: toastId });
       return { success: false, error: error.message };
     } finally {
       set({ loading: false });
@@ -99,13 +109,16 @@ const useAuthStore = create((set, get) => ({
       return;
     }
 
+    const toastId = toast.loading("Signing out...");
     set({ loading: true });
     try {
       await supabase.auth.signOut();
       set({ user: null, isAuthenticated: false });
+      toast.success("Signed out successfully", { id: toastId });
     } catch (error) {
       console.error("Logout error:", error);
       set({ user: null, isAuthenticated: false });
+      toast.error("Error during sign out", { id: toastId });
     } finally {
       set({ loading: false });
     }

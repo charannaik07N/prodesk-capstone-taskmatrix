@@ -31,6 +31,9 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { NoTasks } from "@/components/ui/empty-states";
+import { Loader2 } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { format } from 'date-fns';
@@ -66,12 +69,16 @@ export default function ProjectDetailsPage({ params }) {
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [isSubmittingTask, setIsSubmittingTask] = useState(false);
   const [taskTitle, setTaskTitle] = useState('');
+  
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isDeletingProject, setIsDeletingProject] = useState(false);
 
-  const handleDelete = async () => {
-    if (confirm('Are you sure you want to delete this project and all its tasks?')) {
-      await deleteProject(projectId);
-      router.push('/dashboard');
-    }
+  const executeDeleteProject = async () => {
+    setIsDeletingProject(true);
+    await deleteProject(projectId);
+    setIsDeletingProject(false);
+    setIsDeleteDialogOpen(false);
+    router.push('/dashboard');
   };
 
   const handleCreateTask = async (e) => {
@@ -138,7 +145,7 @@ export default function ProjectDetailsPage({ params }) {
               <DropdownMenuItem className="text-[#111827] cursor-pointer">
                 <Pencil className="w-4 h-4 mr-2" /> Edit Project
               </DropdownMenuItem>
-              <DropdownMenuItem className="text-[#DC2626] cursor-pointer focus:bg-[#DC2626]/10 focus:text-[#DC2626]" onClick={handleDelete}>
+              <DropdownMenuItem className="text-[#DC2626] cursor-pointer focus:bg-[#DC2626]/10 focus:text-[#DC2626]" onClick={() => setIsDeleteDialogOpen(true)}>
                 <Trash2 className="w-4 h-4 mr-2" /> Delete Project
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -193,16 +200,7 @@ export default function ProjectDetailsPage({ params }) {
         </div>
         
         {projectTasks.length === 0 ? (
-          <div className="p-12 flex flex-col items-center justify-center text-center">
-            <div className="w-12 h-12 rounded-full bg-[#F3F4F6] flex items-center justify-center mb-4">
-              <CheckSquare className="w-6 h-6 text-[#9CA3AF]" />
-            </div>
-            <h3 className="text-[15px] font-semibold text-[#111827] mb-1">No tasks yet</h3>
-            <p className="text-[14px] text-[#6B7280] mb-4">Create your first task to get started.</p>
-            <Button onClick={() => setIsTaskModalOpen(true)} variant="outline" className="h-9">
-              <Plus className="w-4 h-4 mr-2" /> Add Task
-            </Button>
-          </div>
+          <NoTasks onAction={() => setIsTaskModalOpen(true)} />
         ) : (
           <Table>
             <TableHeader className="bg-transparent hover:bg-transparent">
@@ -218,7 +216,7 @@ export default function ProjectDetailsPage({ params }) {
               {projectTasks.map((task) => (
                 <TableRow 
                   key={task.id} 
-                  className="cursor-pointer hover:bg-[#F8F9FB] border-b border-[#F3F4F6] transition-colors"
+                  className="cursor-pointer hover:bg-[#F8F9FB] border-b border-[#F3F4F6] transition-colors duration-150"
                   onClick={() => openTaskDrawer(task.id)}
                 >
                   <TableCell className="font-medium text-[13px] text-[#111827] py-3">{task.title || 'Untitled Task'}</TableCell>
@@ -259,13 +257,24 @@ export default function ProjectDetailsPage({ params }) {
               <Button type="button" variant="outline" onClick={() => setIsTaskModalOpen(false)}>
                 Cancel
               </Button>
-              <Button type="submit" disabled={!taskTitle.trim() || isSubmittingTask} className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white">
+              <Button type="submit" disabled={!taskTitle.trim() || isSubmittingTask} className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white inline-flex items-center">
+                {isSubmittingTask && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                 {isSubmittingTask ? 'Creating...' : 'Create Task'}
               </Button>
             </DialogFooter>
           </form>
         </DialogContent>
       </Dialog>
+
+      <ConfirmDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        title="Delete Project?"
+        description="Are you sure you want to delete this project and all its tasks? This action cannot be undone."
+        confirmText="Delete Project"
+        isLoading={isDeletingProject}
+        onConfirm={executeDeleteProject}
+      />
     </div>
   );
 }
