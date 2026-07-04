@@ -124,10 +124,22 @@ const useAuthStore = create((set, get) => ({
     }
   },
 
+  _authSubscription: null,
   initializeAuth: async () => {
     if (!isSupabaseConfigured || !supabase) {
       set({ user: null, isAuthenticated: false, loading: false });
       return;
+    }
+
+    if (!get()._authSubscription) {
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+        if (session?.user) {
+          get().setUser(session.user);
+        } else {
+          set({ user: null, isAuthenticated: false });
+        }
+      });
+      set({ _authSubscription: subscription });
     }
 
     set({ loading: true });

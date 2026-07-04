@@ -1,8 +1,10 @@
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Sidebar from "@/components/Sidebar";
 import DashboardHeader from "@/components/DashboardHeader";
-import TaskDetailsDrawer from "@/components/TaskDetailsDrawer";
-import GlobalSearch from "@/components/GlobalSearch";
+import dynamic from "next/dynamic";
+
+const TaskDetailsDrawer = dynamic(() => import("@/components/TaskDetailsDrawer"));
+const GlobalSearch = dynamic(() => import("@/components/GlobalSearch"));
 
 export const metadata = {
   title: "Dashboard — TaskMatrix",

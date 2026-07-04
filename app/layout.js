@@ -8,6 +8,13 @@ const jakarta = Plus_Jakarta_Sans({
   display: 'swap',
 });
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: '#2563EB',
+};
+
 export const metadata = {
   title: 'TaskMatrix — Enterprise Agile Project Management',
   description:
@@ -17,6 +24,11 @@ export const metadata = {
     title: 'TaskMatrix — Enterprise Agile Project Management',
     description: 'Manage projects, tasks, and sprints with your team.',
     type: 'website',
+    siteName: 'TaskMatrix',
+    locale: 'en_US',
+  },
+  icons: {
+    icon: '/icon',
   },
 };
 
